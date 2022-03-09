@@ -1,0 +1,31 @@
+ユーザー名重複チェック
+1-1 CHECK_USERNAME,ユーザー名,END                
+1-2 RETURN_CHECK_USERNAME,(TRUE|FALSE),END       
+
+ユーザー名登録
+1-1 REGIST_USERNAME,ユーザー名,END
+1-2 RETURN_REGIST_USERNAME,(TRUE|FALSE),END
+
+部屋情報
+1-1 GET_ROOM_INFO,END 部屋情報の取得
+1-2 RETURN_ROOM_INFO,(部屋ID,部屋名,人数,(メンバー,)+)+,END       
+
+入室
+1-1 ENTER_ROOM,部屋ID,ユーザー名,END             
+1-2 RETURN_ENTER_ROOM,(TRUE|FALSE),部屋チャット,END           
+
+退室
+1-1 OUT_ROOM,ユーザー名,部屋ID,END
+1-2 RETURN_OUT_ROOM,(TRUE|FALSE),END
+
+部屋作成
+1-1 CREATE_ROOM,部屋名,END
+1-2 RETURN_CREATE_ROOM,(TRUE|FALSE),END
+
+メッセージ送信
+1-1 SEND_MESSAGE,ユーザー名,部屋ID,メッセージ内容,END
+1-2 RETURN_SEND_MESSAGE,(TRUE|FALSE),END          
+
+チャット取得
+1-1 GET_CHAT,ユーザー名,部屋ID,END
+1-2 RETURN_CHAT,(TRUE|FALSE),チャット,END
