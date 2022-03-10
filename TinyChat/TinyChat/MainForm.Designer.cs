@@ -56,6 +56,8 @@
             this.createRoomButton = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
             this.roomNameTextBox = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.reportLabel = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -121,7 +123,7 @@
             this.groupBox1.Size = new System.Drawing.Size(629, 50);
             this.groupBox1.TabIndex = 5;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "接続";
+            this.groupBox1.Text = "接続設定";
             // 
             // userNameTextBox
             // 
@@ -147,7 +149,7 @@
             this.groupBox2.Controls.Add(this.roomListBox);
             this.groupBox2.Location = new System.Drawing.Point(12, 68);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(249, 143);
+            this.groupBox2.Size = new System.Drawing.Size(282, 143);
             this.groupBox2.TabIndex = 6;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "部屋一覧";
@@ -172,7 +174,7 @@
             // 
             // roomInButton
             // 
-            this.roomInButton.Location = new System.Drawing.Point(131, 110);
+            this.roomInButton.Location = new System.Drawing.Point(172, 110);
             this.roomInButton.Name = "roomInButton";
             this.roomInButton.Size = new System.Drawing.Size(104, 23);
             this.roomInButton.TabIndex = 5;
@@ -188,7 +190,7 @@
             this.roomListBox.Location = new System.Drawing.Point(11, 28);
             this.roomListBox.Name = "roomListBox";
             this.roomListBox.ScrollAlwaysVisible = true;
-            this.roomListBox.Size = new System.Drawing.Size(224, 76);
+            this.roomListBox.Size = new System.Drawing.Size(265, 76);
             this.roomListBox.TabIndex = 0;
             this.roomListBox.Click += new System.EventHandler(this.roomListBox_Click);
             // 
@@ -197,9 +199,9 @@
             this.groupBox3.Controls.Add(this.sendMessageButton);
             this.groupBox3.Controls.Add(this.sendMessageTextBox);
             this.groupBox3.Controls.Add(this.resiveMessageTextBox);
-            this.groupBox3.Location = new System.Drawing.Point(267, 68);
+            this.groupBox3.Location = new System.Drawing.Point(300, 68);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(374, 400);
+            this.groupBox3.Size = new System.Drawing.Size(341, 400);
             this.groupBox3.TabIndex = 7;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "チャット";
@@ -208,7 +210,7 @@
             // 
             this.sendMessageButton.Location = new System.Drawing.Point(6, 371);
             this.sendMessageButton.Name = "sendMessageButton";
-            this.sendMessageButton.Size = new System.Drawing.Size(362, 23);
+            this.sendMessageButton.Size = new System.Drawing.Size(329, 23);
             this.sendMessageButton.TabIndex = 6;
             this.sendMessageButton.Text = "送信する";
             this.sendMessageButton.UseVisualStyleBackColor = true;
@@ -221,7 +223,7 @@
             this.sendMessageTextBox.Multiline = true;
             this.sendMessageTextBox.Name = "sendMessageTextBox";
             this.sendMessageTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.sendMessageTextBox.Size = new System.Drawing.Size(362, 113);
+            this.sendMessageTextBox.Size = new System.Drawing.Size(329, 113);
             this.sendMessageTextBox.TabIndex = 1;
             // 
             // resiveMessageTextBox
@@ -232,7 +234,7 @@
             this.resiveMessageTextBox.Name = "resiveMessageTextBox";
             this.resiveMessageTextBox.ReadOnly = true;
             this.resiveMessageTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.resiveMessageTextBox.Size = new System.Drawing.Size(362, 232);
+            this.resiveMessageTextBox.Size = new System.Drawing.Size(329, 232);
             this.resiveMessageTextBox.TabIndex = 0;
             // 
             // groupBox4
@@ -245,7 +247,7 @@
             this.groupBox4.Controls.Add(this.roomMemberStatusListBox);
             this.groupBox4.Location = new System.Drawing.Point(12, 217);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(249, 170);
+            this.groupBox4.Size = new System.Drawing.Size(282, 170);
             this.groupBox4.TabIndex = 7;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "部屋情報";
@@ -303,7 +305,7 @@
             this.roomMemberStatusListBox.Location = new System.Drawing.Point(11, 84);
             this.roomMemberStatusListBox.Name = "roomMemberStatusListBox";
             this.roomMemberStatusListBox.ScrollAlwaysVisible = true;
-            this.roomMemberStatusListBox.Size = new System.Drawing.Size(223, 76);
+            this.roomMemberStatusListBox.Size = new System.Drawing.Size(265, 76);
             this.roomMemberStatusListBox.TabIndex = 0;
             // 
             // groupBox5
@@ -313,14 +315,14 @@
             this.groupBox5.Controls.Add(this.roomNameTextBox);
             this.groupBox5.Location = new System.Drawing.Point(12, 393);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(249, 75);
+            this.groupBox5.Size = new System.Drawing.Size(282, 75);
             this.groupBox5.TabIndex = 12;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "部屋作成";
             // 
             // createRoomButton
             // 
-            this.createRoomButton.Location = new System.Drawing.Point(159, 46);
+            this.createRoomButton.Location = new System.Drawing.Point(201, 43);
             this.createRoomButton.Name = "createRoomButton";
             this.createRoomButton.Size = new System.Drawing.Size(75, 23);
             this.createRoomButton.TabIndex = 7;
@@ -341,14 +343,34 @@
             // 
             this.roomNameTextBox.Location = new System.Drawing.Point(54, 18);
             this.roomNameTextBox.Name = "roomNameTextBox";
-            this.roomNameTextBox.Size = new System.Drawing.Size(181, 19);
+            this.roomNameTextBox.Size = new System.Drawing.Size(222, 19);
             this.roomNameTextBox.TabIndex = 0;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(12, 473);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(29, 12);
+            this.label9.TabIndex = 12;
+            this.label9.Text = "報告";
+            // 
+            // reportLabel
+            // 
+            this.reportLabel.AutoSize = true;
+            this.reportLabel.Location = new System.Drawing.Point(47, 473);
+            this.reportLabel.Name = "reportLabel";
+            this.reportLabel.Size = new System.Drawing.Size(29, 12);
+            this.reportLabel.TabIndex = 13;
+            this.reportLabel.Text = "none";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(651, 474);
+            this.ClientSize = new System.Drawing.Size(651, 494);
+            this.Controls.Add(this.reportLabel);
+            this.Controls.Add(this.label9);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
@@ -368,6 +390,7 @@
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -401,6 +424,8 @@
         private System.Windows.Forms.Button createRoomButton;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox roomNameTextBox;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label reportLabel;
     }
 }
 

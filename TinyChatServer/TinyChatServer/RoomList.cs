@@ -43,7 +43,7 @@ namespace TinyChatServer
 
         public static void SetChat(int id, string userName, string chat)
         {
-            _roomList[id].Chat = $"{DateTime.Now} : {userName} > {chat}\r\n";
+            _roomList[id].Chat = $"{DateTime.Now} : {userName} > {chat}{Escape.Return}";
             Debug.WriteLine(_roomList[id].Chat);
         }
 
@@ -61,6 +61,14 @@ namespace TinyChatServer
         public static int GetCount()
         {
             return _roomList.Count;
+        }
+
+        public static List<Room> GetRoomList()
+        {
+            List<Room> tmpRoomList = new List<Room>();
+            foreach (var room in _roomList)
+                tmpRoomList.Add(room.Value);
+            return tmpRoomList;
         }
     }
 }

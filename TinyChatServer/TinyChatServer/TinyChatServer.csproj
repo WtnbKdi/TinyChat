@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="CommandAnalyzer.cs" />
     <Compile Include="CreateCommand.cs" />
+    <Compile Include="Escape.cs" />
     <Compile Include="LoginUserName.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>

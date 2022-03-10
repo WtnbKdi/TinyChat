@@ -45,9 +45,17 @@ namespace TinyChatServer
         // 接続要求受け入れコールバック
         void acceptCallBack(IAsyncResult result)
         {
+            Socket tcpClient = null;
             _acceptStopper.Set();
-            Invoke(new Action(() => logTextBox.Text += "接続が完了しました。\r\n"));
-            Socket tcpClient = ((Socket)result.AsyncState).EndAccept(result);
+            Invoke(new Action(() => writeLog("接続が完了しました。")));
+            try
+            {
+                tcpClient = ((Socket)result.AsyncState).EndAccept(result);
+            }
+            catch (Exception ex)
+            {
+                writeLog(ex.Message);
+            }
             resiveAsync(tcpClient, new ResiveDataInfo());
         }
 
@@ -55,20 +63,29 @@ namespace TinyChatServer
         void resiveAsync(Socket tcpClient, ResiveDataInfo rDataInfo)
         {
             rDataInfo.Socket = tcpClient;
-            tcpClient.BeginReceive(rDataInfo.ResiveBuffer,
+            try
+            {
+                tcpClient.BeginReceive(rDataInfo.ResiveBuffer,
                         0,
                         ResiveDataInfo.ResiveBufferSize,
                         SocketFlags.None,
                         new AsyncCallback(resiveCallBack),
                         rDataInfo);
+            }
+            catch (Exception ex)
+            {
+                writeLog(ex.Message);
+                rDataInfo.Socket.Close();
+            }
         }
 
         // 受信コールバック
         void resiveCallBack(IAsyncResult result)
         {
+            ResiveDataInfo rDataInfo = null;
             try
             {
-                ResiveDataInfo rDataInfo = (ResiveDataInfo)result.AsyncState;
+                rDataInfo = (ResiveDataInfo)result.AsyncState;
                 int readByte = rDataInfo.Socket.EndReceive(result);
                 if (readByte > 0)
                 {
@@ -87,8 +104,9 @@ namespace TinyChatServer
                 // 受信処理完了後、再び受信を開始
                 resiveAsync(rDataInfo.Socket, rDataInfo);
             }
-            catch(System.Net.Sockets.SocketException ex)
+            catch(Exception ex)
             {
+                rDataInfo.Socket.Close();
                 writeLog(ex.Message);
             }
         }
@@ -96,24 +114,44 @@ namespace TinyChatServer
         void sendAsync(Socket tcpClient, string message)
         {
             writeLog(message);
-            byte[] sendMessage = Encoding.UTF8.GetBytes(message);
-            tcpClient.BeginSend(sendMessage, 
-                0, 
-                sendMessage.Length, 
-                SocketFlags.None,
-                new AsyncCallback(sendAsyncCallBack), 
-                tcpClient);
+            try
+            {
+                byte[] sendMessage = Encoding.UTF8.GetBytes(message);
+                tcpClient.BeginSend(sendMessage,
+                    0,
+                    sendMessage.Length,
+                    SocketFlags.None,
+                    new AsyncCallback(sendAsyncCallBack),
+                    tcpClient);
+            }
+            catch (Exception ex)
+            {
+                tcpClient.Close();
+                writeLog(ex.Message);
+            }
         }
 
         void sendAsyncCallBack(IAsyncResult result)
         {
-            Socket tcpClient = (Socket)result.AsyncState;
-            if (tcpClient.EndSend(result) < 0) throw new Exception("送信エラー");
+            Socket tcpClient = null;
+            try
+            {
+                tcpClient = (Socket)result.AsyncState;
+                if (tcpClient.EndSend(result) < 0)
+                {
+                    throw new Exception("送信エラー");
+                }
+            }
+            catch (Exception ex)
+            {
+                writeLog(ex.Message);
+                tcpClient.Close();
+            }
         }
 
         void writeLog(string log)
         {
-            Invoke(new Action(() => logTextBox.Text += log + "\r\n"));
+            Invoke(new Action(() => logTextBox.Text += log + Escape.Return));
         }
     }
 }

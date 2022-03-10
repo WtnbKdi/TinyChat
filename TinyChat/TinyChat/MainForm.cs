@@ -11,26 +11,80 @@ namespace TinyChat
 {
     public partial class MainForm : Form
     {
-        Socket _client = null;
-        bool _isConnected = false;
-        bool _isGetChatPooling = false;
-        object _loomListLock = new object();
+        
+        bool _isConnected, _isRunning;
+        object _loomListLock;
+        Socket _client;
         ManualResetEvent _checkUserNameStopper = new ManualResetEvent(false);
         ManualResetEvent _registUserNameStopper = new ManualResetEvent(false);
+        
         public MainForm()
         {
             InitializeComponent();
+            _isConnected = false;
+            SyncFlag.IsGetChatPooling = false;
+            SyncFlag.IsGetRoomInfoPooling = false;
+            _isRunning = false;
+            _loomListLock = new object();
+            _client = null;
             ClientInfo.CurrentRoomID = -1;
+        }
+
+        // UIの状態
+        void stateEnabled(bool state)
+        {
+            Invoke(new Action(() =>
+            {
+                userNameTextBox.Enabled = state;
+                portNumTextBox.Enabled = state;
+                ipAddressTextBox.Enabled = state;
+                connectButton.Text = state ? "接続する" : "切断する";
+                if (state)
+                {
+                    _client?.Close();
+                    _client = null;
+                    _checkUserNameStopper.Reset();
+                    _registUserNameStopper.Reset();
+                    _isConnected = !state;
+                    SyncFlag.IsGetChatPooling = false;
+                    SyncFlag.IsGetRoomInfoPooling = false;
+                    this.Close();
+                }
+            }));
+        }
+
+        void ShowReport(string message, string functionName = "")
+        {
+            Invoke(new Action(() => reportLabel.Text = functionName + message));
         }
 
         // 接続ボタン
         private void connectButton_Click(object sender, EventArgs e)
         {
+            string ipAddr = ipAddressTextBox.Text, 
+                   port = portNumTextBox.Text, 
+                   userName = userNameTextBox.Text;
+
+            if (!ConnectInfoFormat.Check(ipAddr, port, userName))
+            {
+                ShowReport("接続設定を確認してください。(ユーザー名は4~10文字です)");
+                return;
+            }
+
+            if (_isRunning)
+            {
+                sendAsync(CreateCommand.DISSCONNECT(ClientInfo.UserName));
+                stateEnabled(true);
+                return;
+            }
+
+            _isRunning = true;
+            stateEnabled(false);
             IPAddress ipaddress = IPAddress.Parse(ipAddressTextBox.Text);
             int portNum = Convert.ToInt32(portNumTextBox.Text);
             Socket socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-            socket.BeginConnect(ipaddress, portNum, new AsyncCallback(connectCallBack), socket);
             ClientInfo.UserName = userNameTextBox.Text;
+            socket.BeginConnect(ipaddress, portNum, new AsyncCallback(connectCallBack), socket);
         }
 
         // 接続コールバック
@@ -38,16 +92,29 @@ namespace TinyChat
         {
             _checkUserNameStopper.Reset();
             _registUserNameStopper.Reset();
-            _client = ((Socket)result.AsyncState);
-            _client.EndConnect(result);
-            printResiveMessage("接続完了");
-            _isConnected = true;
-            sendAsync(CreateCommand.CHECK_USERNAME(userNameTextBox.Text)); // ユーザー名の重複を確認
-            _checkUserNameStopper.WaitOne();
-            if (_client == null) return;
-            sendAsync(CreateCommand.REGIST_USERNAME(userNameTextBox.Text)); // ユーザー名をサーバーへ登録
-            _registUserNameStopper.WaitOne();
-            GetRoomInfoPooling(); // 部屋情報常時取得
+
+            try
+            {
+                _client = ((Socket)result.AsyncState);
+                _client.EndConnect(result);
+                ShowReport("接続完了");
+                _isConnected = true;
+                sendAsync(CreateCommand.CHECK_USERNAME(userNameTextBox.Text)); // ユーザー名の重複を確認
+                _checkUserNameStopper.WaitOne();
+                if (_client == null)
+                {
+                    stateEnabled(true);
+                    return;
+                }
+                sendAsync(CreateCommand.REGIST_USERNAME(userNameTextBox.Text)); // ユーザー名をサーバーへ登録
+                _registUserNameStopper.WaitOne();
+                GetRoomInfoPooling(); // 部屋情報常時取得
+            }
+            catch (Exception ex)
+            {
+                ShowReport(ex.Message, nameof(connectCallBack));
+                stateEnabled(true);
+            }
         }
 
         // メッセージ送信ボタン
@@ -66,12 +133,20 @@ namespace TinyChat
         void resiveAsync(ResiveDataInfo rDataInfo)
         {
             rDataInfo.Socket = _client;
-            _client.BeginReceive(rDataInfo.Buffer
+            try
+            {
+                _client.BeginReceive(rDataInfo.Buffer
                 , 0
                 , ResiveDataInfo.BufferSize
                 , SocketFlags.None,
                 new AsyncCallback(resiveCallBack),
                 rDataInfo);
+            }
+            catch (Exception ex)
+            {
+                ShowReport(ex.Message, nameof(resiveAsync));
+                stateEnabled(true);
+            }
         }
 
         // 受信コマンド解析実行
@@ -171,29 +246,39 @@ namespace TinyChat
         // 受信コールバック
         void resiveCallBack(IAsyncResult result)
         {
-            ResiveDataInfo rDataInfo = (ResiveDataInfo)result.AsyncState;
-            _client = rDataInfo.Socket;
-            int resiveSize = _client.EndReceive(result);
-            if(resiveSize > 0)
+            ResiveDataInfo rDataInfo = null;
+            try
             {
-                rDataInfo.ResiveData.Append(Encoding.UTF8.GetString(rDataInfo.Buffer, 0, resiveSize));
-                if (rDataInfo.ResiveData.ToString().IndexOf("END") < 0)
+                rDataInfo = (ResiveDataInfo)result.AsyncState;
+                _client = rDataInfo.Socket;
+                int resiveSize = _client.EndReceive(result);
+                if (resiveSize > 0)
                 {
-                    resiveAsync(rDataInfo);
-                    return;
+                    rDataInfo.ResiveData.Append(Encoding.UTF8.GetString(rDataInfo.Buffer, 0, resiveSize));
+                    if (rDataInfo.ResiveData.ToString().IndexOf("END") < 0)
+                    {
+                        resiveAsync(rDataInfo);
+                        return;
+                    }
+                    string resiveMessage = rDataInfo.ResiveData.ToString();
+                    commandAnalyzer(resiveMessage);
+                    rDataInfo.ResiveData.Clear();
                 }
-                string resiveMessage = rDataInfo.ResiveData.ToString();
-                commandAnalyzer(resiveMessage);
-                rDataInfo.ResiveData.Clear();
+            }
+            catch (Exception ex)
+            {
+                rDataInfo.Socket.Close();
+                ShowReport(ex.Message);
+                stateEnabled(true);
             }
         }
 
         // 送信
         void sendAsync(string message)
         {
-            byte[] sendMessage = Encoding.UTF8.GetBytes($"{message}");
             try
             {
+                byte[] sendMessage = Encoding.UTF8.GetBytes($"{message}");
                 _client.BeginSend(sendMessage,
                     0,
                     sendMessage.Length,
@@ -204,10 +289,10 @@ namespace TinyChat
                 rDataInfo.Socket = _client;
                 resiveAsync(rDataInfo);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                printResiveMessage(ex.Message);
-                return;
+                ShowReport(ex.Message, nameof(sendAsync));
+                stateEnabled(true);
             }
         }
 
@@ -215,12 +300,15 @@ namespace TinyChat
         void sendCallBack(IAsyncResult result)
         {
             _client = (Socket)result.AsyncState;
-            if(_client.EndSend(result) < 0) throw new Exception("送信エラー");
+            if(_client.EndSend(result) < 0)
+            {
+                ShowReport("送信エラー");
+            }
         }
 
         void printResiveMessage(string message)
         {
-            Invoke(new Action(() => resiveMessageTextBox.Text += message + "\r\n"));
+            Invoke(new Action(() => resiveMessageTextBox.Text += message + Escape.Return));
         }
 
         // 部屋情報更新
@@ -245,14 +333,14 @@ namespace TinyChat
             int selectRoomIndex = Convert.ToInt32(selectedRoomIDLabel.Text);
             if (selectRoomIndex == -1)
             {
-                Debug.WriteLine("入室エラー");
+                ShowReport("入室エラー");
                 return;
             }
             int roomID = RoomInfoList.Get(selectRoomIndex).ID;
             sendAsync(CreateCommand.ENTER_ROOM(roomID.ToString(), userNameTextBox.Text));
             ClientInfo.CurrentRoomID = Convert.ToInt32(roomID);
             SetRoomStatusInfo(RoomInfoList.Get(selectRoomIndex));
-            if(!_isGetChatPooling)
+            if(!SyncFlag.IsGetChatPooling)
             {
                 GetChatPooling();
                 return;
@@ -262,12 +350,20 @@ namespace TinyChat
         // チャット常時受信
         void GetChatPooling()
         {
-            _isGetChatPooling = true;
+            SyncFlag.IsGetChatPooling = true;
             Task.Run(() => {
-                while (true)
+                while (SyncFlag.IsGetChatPooling)
                 {
-                    sendAsync(CreateCommand.GET_CHAT(ClientInfo.UserName, ClientInfo.CurrentRoomID.ToString()));
-                    Debug.WriteLine("GETCHAT");
+                    try
+                    {
+                        sendAsync(CreateCommand.GET_CHAT(ClientInfo.UserName, ClientInfo.CurrentRoomID.ToString()));
+                    }
+                    catch (Exception ex)
+                    {
+                        ShowReport(ex.Message, nameof(GetChatPooling));
+                        stateEnabled(true);
+                        break;
+                    }
                     Thread.Sleep(1000);
                 }
             });
@@ -276,10 +372,20 @@ namespace TinyChat
         // 部屋情報常時受信
         void GetRoomInfoPooling()
         {
+            SyncFlag.IsGetRoomInfoPooling = true;
             Task.Run(() => {
-                while (true)
+                while (SyncFlag.IsGetRoomInfoPooling)
                 {
-                    sendAsync(CreateCommand.GET_ROOM_INFO()); // 部屋情報取得
+                    try
+                    {
+                        sendAsync(CreateCommand.GET_ROOM_INFO()); // 部屋情報取得
+                    }
+                    catch (Exception ex)
+                    {
+                        ShowReport(ex.Message, nameof(GetRoomInfoPooling));
+                        stateEnabled(true);
+                        break;
+                    }
                     Thread.Sleep(1000 * 3);
                 }
             });

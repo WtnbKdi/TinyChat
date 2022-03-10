@@ -47,6 +47,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CreateCommand.cs" />
+    <Compile Include="ConnectInfoFormat.cs" />
+    <Compile Include="Escape.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -59,6 +61,7 @@
     <Compile Include="ClientInfo.cs" />
     <Compile Include="RoomInfo.cs" />
     <Compile Include="RoomInfoList.cs" />
+    <Compile Include="SyncFlag.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

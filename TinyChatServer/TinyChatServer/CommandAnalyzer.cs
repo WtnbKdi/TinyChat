@@ -70,6 +70,13 @@ namespace TinyChatServer
                 return CreateCommand.RETURN_CREATE_ROOM(true);
             }
 
+            if (commad.StartsWith("DISSCONNECT"))
+            {
+                int memberName = 1;
+                List<Room> roomList = RoomList.GetRoomList();
+                foreach(var room in roomList)
+                    RoomList.RemoveMember(room.ID, tokens[memberName]);
+            }
             return null;
         }
     }

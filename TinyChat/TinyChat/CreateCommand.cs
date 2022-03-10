@@ -10,7 +10,7 @@ namespace TinyChat
     {
         public static string CHECK_USERNAME(string userName)
         {
-            return $"CHECK_USERNAME,{userName},END ";
+            return $"CHECK_USERNAME,{userName},END";
         }
 
         public static string REGIST_USERNAME(string userName)
@@ -25,7 +25,7 @@ namespace TinyChat
 
         public static string ENTER_ROOM(string roomID, string userName)
         {
-            return $"ENTER_ROOM,{roomID},{userName},END ";
+            return $"ENTER_ROOM,{roomID},{userName},END";
         }
 
         public static string SEND_MESSAGE(string userName, string roomID, string message)
@@ -47,6 +47,11 @@ namespace TinyChat
         public static string CREATE_ROOM(string roomName)
         {
             return $"CREATE_ROOM,{roomName},END";
+        }
+
+        public static string DISSCONNECT(string userName)
+        {
+            return $"DISSCONNECT,{userName},END";
         }
     }
 }
