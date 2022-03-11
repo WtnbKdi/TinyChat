@@ -11,7 +11,6 @@ namespace TinyChat
 {
     public partial class MainForm : Form
     {
-        
         bool _isConnected, _isRunning;
         object _loomListLock;
         Socket _client;

@@ -44,7 +44,7 @@ namespace TinyChatServer
                 int USER_NAME = 1;
                 int ROOM_ID = 2;
                 int MESSAGE = 3;
-                RoomList.SetChat(Convert.ToInt32(tokens[ROOM_ID]), tokens[USER_NAME], tokens[MESSAGE]);
+                RoomList.AddChat(Convert.ToInt32(tokens[ROOM_ID]), tokens[USER_NAME], tokens[MESSAGE]);
                 return CreateCommand.RETURN_SEND_MESSAGE(true);
             }
             if (commad.StartsWith("GET_CHAT"))

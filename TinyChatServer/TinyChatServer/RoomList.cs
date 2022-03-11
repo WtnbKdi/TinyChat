@@ -10,9 +10,10 @@ namespace TinyChatServer
     static class RoomList
     {
         static Dictionary<int, Room> _roomList = new Dictionary<int, Room>();
+        static object _roomListLock = new object();
         public static void Add(int id, Room room)
         {
-            _roomList.Add(id, room);
+            lock(_roomListLock) _roomList.Add(id, room);
         }
 
         // (部屋ID,部屋名,)+の文字列を返す
@@ -38,36 +39,44 @@ namespace TinyChatServer
 
         public static string GetChat(int id)
         {
-            return _roomList[id].Chat;
+            lock (_roomListLock)
+                return _roomList[id].Chat;
         }
 
-        public static void SetChat(int id, string userName, string chat)
+        public static void AddChat(int id, string userName, string chat)
         {
-            _roomList[id].Chat = $"{DateTime.Now} : {userName} > {chat}{Escape.Return}";
-            Debug.WriteLine(_roomList[id].Chat);
+            lock (_roomListLock)
+            {
+                _roomList[id].Chat = $"{DateTime.Now} : {userName} > {chat}{Escape.Return}";
+                Debug.WriteLine(_roomList[id].Chat);
+            }
         }
 
         public static void AddMember(int id, string memberName)
         {
-            _roomList[id].MemberNameList.Add(memberName);
+            lock (_roomListLock)
+                _roomList[id].MemberNameList.Add(memberName);
         }
 
         public static void RemoveMember(int id, string memberName)
         {
             if (id == -1) return;
-            _roomList[id].MemberNameList.Remove(memberName);
+            lock (_roomListLock)
+                _roomList[id].MemberNameList.Remove(memberName);
         }
 
         public static int GetCount()
         {
-            return _roomList.Count;
+            lock (_roomListLock)
+                return _roomList.Count;
         }
 
         public static List<Room> GetRoomList()
         {
             List<Room> tmpRoomList = new List<Room>();
-            foreach (var room in _roomList)
-                tmpRoomList.Add(room.Value);
+            lock (_roomListLock)
+                foreach (var room in _roomList)
+                    tmpRoomList.Add(room.Value);
             return tmpRoomList;
         }
     }
