@@ -20,18 +20,21 @@ namespace TinyChatServer
         public static string GetCommandInfo()
         {
             StringBuilder info = new StringBuilder();
-            foreach (var element in _roomList)
+            lock (_roomListLock)
             {
-                info.Append(element.Key); // 部屋ID
-                info.Append(",");
-                info.Append(element.Value.Name); // 部屋名
-                info.Append(",");
-                info.Append(element.Value.MemberNameList.Count); // 人数
-                info.Append(",");
-                foreach(var memberName in element.Value.MemberNameList) // メンバー名
+                foreach (var element in _roomList)
                 {
-                    info.Append(memberName);
+                    info.Append(element.Key); // 部屋ID
                     info.Append(",");
+                    info.Append(element.Value.Name); // 部屋名
+                    info.Append(",");
+                    info.Append(element.Value.MemberNameList.Count); // 人数
+                    info.Append(",");
+                    foreach (var memberName in element.Value.MemberNameList) // メンバー名
+                    {
+                        info.Append(memberName);
+                        info.Append(",");
+                    }
                 }
             }
             return info.ToString();
