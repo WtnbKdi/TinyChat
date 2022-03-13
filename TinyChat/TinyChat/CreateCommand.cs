@@ -43,7 +43,6 @@ namespace TinyChat
             return $"OUT_ROOM,{userName},{roomID},END";
         }
 
-        // CREATE_ROOM,部屋名,END
         public static string CREATE_ROOM(string roomName)
         {
             return $"CREATE_ROOM,{roomName},END";

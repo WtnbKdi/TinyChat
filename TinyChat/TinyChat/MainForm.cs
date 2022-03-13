@@ -29,7 +29,7 @@ namespace TinyChat
             ClientInfo.CurrentRoomID = -1;
         }
 
-        // UIの状態
+        // 各有効状態
         void stateEnabled(bool state)
         {
             Invoke(new Action(() =>
@@ -148,100 +148,6 @@ namespace TinyChat
             }
         }
 
-        // 受信コマンド解析実行
-        void commandAnalyzer(string command)
-        {
-            string[] tokens;
-            try { tokens = command.Split(','); }
-            catch { throw; }
-            if (command.StartsWith("RETURN_CHECK_USERNAME"))
-            {
-                int RESULT = 1;
-                if (tokens[RESULT] == "FALSE")
-                {
-                    _client = null;
-                    printResiveMessage("このユーザー名は既に使用されています。");
-                }
-                _checkUserNameStopper.Set();
-                return;
-            }
-            if (command.StartsWith("RETURN_REGIST_USERNAME"))
-            {
-                int RESULT = 1;
-                if (tokens[RESULT] == "FALSE") 
-                    printResiveMessage("ユーザー名の登録に失敗しました。");
-                _registUserNameStopper.Set();
-                return;
-            }
-            if (command.StartsWith("RETURN_ROOM_INFO"))
-            {
-                RoomInfoList.ClearAll();
-                Invoke(new Action(() => roomListBox.Items.Clear()));
-                int index = 1;
-                while (tokens[index] != "END")
-                {
-                    RoomInfo roomInfo = new RoomInfo();
-                    roomInfo.ID = Convert.ToInt32(tokens[index++]); // ID
-                    roomInfo.Name = tokens[index++]; // 部屋名
-                    roomInfo.MemberNum = Convert.ToInt32(tokens[index++]); // 部屋人数
-                    int memberNum = index + roomInfo.MemberNum;
-                    while (index < memberNum) 
-                        roomInfo.MemberNameList.Add(tokens[index++]); // メンバー名を追加していく
-                    RoomInfoList.Add(roomInfo);
-                    string listStr = $"部屋ID:{roomInfo.ID},部屋名:{roomInfo.Name},部屋人数:{roomInfo.MemberNum}";
-                    Invoke(new Action(() =>
-                    {
-                        lock (_loomListLock) roomListBox.Items.Add(listStr);
-                    }));
-                }
-                if(ClientInfo.CurrentRoomID >= 0)
-                    SetRoomStatusInfo(RoomInfoList.Get(ClientInfo.CurrentRoomID));
-                return;
-            }
-            if (command.StartsWith("RETURN_ENTER_ROOM")) 
-            {
-                int FLAG = 1;
-                int ROOM_CHAT = 2;
-                if (tokens[FLAG] != "TRUE")
-                {
-                    printResiveMessage("入室に失敗しました。");
-                    return;
-                }
-                Invoke(new Action(() => resiveMessageTextBox.Clear()));
-                printResiveMessage(tokens[ROOM_CHAT]);
-                return;
-            }
-            if (command.StartsWith("RETURN_CHAT"))
-            {
-                int FLAG = 1;
-                int CHAT = 2;
-                if(tokens[FLAG] == "FALSE")
-                {
-                    printResiveMessage("チャットの取得に失敗");
-                    return;
-                }
-                Invoke(new Action(() => resiveMessageTextBox.Text = tokens[CHAT]));
-            }
-            if (command.StartsWith("RETURN_OUT_ROOM"))
-            {
-                int FLAG = 1;
-                if (tokens[FLAG] == "FALSE")
-                {
-                    printResiveMessage("退室に失敗しました。");
-                    return;
-                }
-            }
-            if (command.StartsWith("RETURN_CREATE_ROOM"))
-            {
-                int FLAG = 1;
-                if (tokens[FLAG] == "FALSE")
-                {
-                    printResiveMessage("部屋の作成に失敗しました。");
-                    return;
-                }
-            }
-        }
-
         // 受信コールバック
         void resiveCallBack(IAsyncResult result)
         {
@@ -271,6 +177,104 @@ namespace TinyChat
                 stateEnabled(true);
             }
         }
+
+        // 受信コマンド解析実行
+        void commandAnalyzer(string command)
+        {
+            string[] tokens;
+            try { tokens = command.Split(','); }
+            catch { throw; }
+
+            if (command.StartsWith("RETURN_CHECK_USERNAME"))
+            {
+                int RESULT = 1;
+                if (tokens[RESULT] == "FALSE")
+                {
+                    _client = null;
+                    printResiveMessage("このユーザー名は既に使用されています。");
+                }
+                _checkUserNameStopper.Set();
+                return;
+            }
+
+            if (command.StartsWith("RETURN_REGIST_USERNAME"))
+            {
+                int RESULT = 1;
+                if (tokens[RESULT] == "FALSE") 
+                    printResiveMessage("ユーザー名の登録に失敗しました。");
+                _registUserNameStopper.Set();
+                return;
+            }
+
+            if (command.StartsWith("RETURN_ROOM_INFO"))
+            {
+                RoomInfoList.ClearAll();
+                Invoke(new Action(() => roomListBox.Items.Clear()));
+                int index = 1;
+                while (tokens[index] != "END")
+                {
+                    RoomInfo roomInfo = new RoomInfo();
+                    roomInfo.ID = Convert.ToInt32(tokens[index++]); // ID
+                    roomInfo.Name = tokens[index++]; // 部屋名
+                    roomInfo.MemberNum = Convert.ToInt32(tokens[index++]); // 部屋人数
+                    int memberNum = index + roomInfo.MemberNum;
+                    while (index < memberNum) 
+                        roomInfo.MemberNameList.Add(tokens[index++]); // メンバー名を追加していく
+                    RoomInfoList.Add(roomInfo);
+                    string listStr = $"部屋ID:{roomInfo.ID},部屋名:{roomInfo.Name},部屋人数:{roomInfo.MemberNum}";
+                    Invoke(new Action(() =>
+                    {
+                        lock (_loomListLock) roomListBox.Items.Add(listStr);
+                    }));
+                }
+                if(ClientInfo.CurrentRoomID >= 0)
+                    SetRoomStatusInfo(RoomInfoList.Get(ClientInfo.CurrentRoomID));
+                return;
+            }
+
+            if (command.StartsWith("RETURN_ENTER_ROOM")) 
+            {
+                int FLAG = 1;
+                int ROOM_CHAT = 2;
+                if (tokens[FLAG] != "TRUE")
+                {
+                    printResiveMessage("入室に失敗しました。");
+                    return;
+                }
+                Invoke(new Action(() => resiveMessageTextBox.Clear()));
+                printResiveMessage(tokens[ROOM_CHAT]);
+                return;
+            }
+
+            if (command.StartsWith("RETURN_CHAT"))
+            {
+                int FLAG = 1;
+                int CHAT = 2;
+                if(tokens[FLAG] == "FALSE")
+                {
+                    printResiveMessage("チャットの取得に失敗");
+                    return;
+                }
+                Invoke(new Action(() => printResiveMessage(tokens[CHAT])));
+                return;
+            }
+
+            if (command.StartsWith("RETURN_OUT_ROOM"))
+            {
+                int FLAG = 1;
+                if (tokens[FLAG] == "FALSE")
+                    printResiveMessage("退室に失敗しました。");
+            }
+
+            if (command.StartsWith("RETURN_CREATE_ROOM"))
+            {
+                int FLAG = 1;
+                if (tokens[FLAG] == "FALSE")
+                    printResiveMessage("部屋の作成に失敗しました。");
+            }
+        }
+
+        
 
         // 送信
         void sendAsync(string message)
