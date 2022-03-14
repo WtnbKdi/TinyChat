@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -35,7 +36,7 @@ namespace TinyChat
                 userNameTextBox.Enabled = state;
                 portNumTextBox.Enabled = state;
                 ipAddressTextBox.Enabled = state;
-                connectButton.Text = state ? "接続する" : "終了する";
+                connectButton.Text = state ? "接続する" : "切断する";
                 if (state)
                 {
                     _client?.Close();
@@ -43,17 +44,17 @@ namespace TinyChat
                     _checkUserNameStopper.Reset();
                     _registUserNameStopper.Reset();
                     _isConnected = false;
+                    _isRunning = false;
                     SyncFlag.IsGetChatPooling = false;
                     SyncFlag.IsGetRoomInfoPooling = false;
+                    resiveMessageTextBox.Clear();
+                    roomListBox.Items.Clear();
+                    roomMemberStatusListBox.Items.Clear();
                 }
             }));
         }
 
-        void ShowReport(string message, string functionName = "")
-        {
-            Invoke(new Action(() => reportLabel.Text = functionName + message));
-            Debug.WriteLine(functionName + message);
-        }
+        
 
         // 接続ボタン
         private void connectButton_Click(object sender, EventArgs e)
@@ -64,14 +65,14 @@ namespace TinyChat
 
             if (!ConnectInfoFormat.Check(ipAddr, port, userName))
             {
-                ShowReport("接続設定を確認してください。(ユーザー名は4~10文字です)");
+                ShowReport(true, "接続設定を確認してください。(ユーザー名の場合は4~10文字です)");
                 return;
             }
 
             if (_isRunning)
             {
                 sendAsync(CreateCommand.DISSCONNECT(ClientInfo.UserName));
-                this.Close();
+                stateEnabled(true);
                 return;
             }
 
@@ -94,7 +95,7 @@ namespace TinyChat
             {
                 _client = ((Socket)result.AsyncState);
                 _client.EndConnect(result);
-                ShowReport("接続完了");
+                ShowReport(false, "接続完了");
                 _isConnected = true;
                 sendAsync(CreateCommand.CHECK_USERNAME(userNameTextBox.Text)); // ユーザー名の重複を確認
                 _checkUserNameStopper.WaitOne();
@@ -109,7 +110,7 @@ namespace TinyChat
             }
             catch (Exception ex)
             {
-                ShowReport(ex.Message, nameof(connectCallBack));
+                Debug.WriteLine(ex.Message);
                 stateEnabled(true);
             }
         }
@@ -142,7 +143,7 @@ namespace TinyChat
             }
             catch (Exception ex)
             {
-                ShowReport(ex.Message, nameof(resiveAsync));
+                Debug.WriteLine(ex.Message);
                 stateEnabled(true);
             }
         }
@@ -172,7 +173,7 @@ namespace TinyChat
             catch (Exception ex)
             {
                 rDataInfo.Socket.Close();
-                ShowReport(ex.Message);
+                Debug.WriteLine(ex.Message);
                 stateEnabled(true);
             }
         }
@@ -190,7 +191,7 @@ namespace TinyChat
                 if (tokens[RESULT] == "FALSE")
                 {
                     _client = null;
-                    printResiveMessage("このユーザー名は既に使用されています。");
+                    ShowReport(true, "このユーザー名は既に使用されています。");
                 }
                 _checkUserNameStopper.Set();
                 return;
@@ -200,7 +201,7 @@ namespace TinyChat
             {
                 int RESULT = 1;
                 if (tokens[RESULT] == "FALSE") 
-                    printResiveMessage("ユーザー名の登録に失敗しました。");
+                    ShowReport(true, "ユーザー名の登録に失敗しました。");
                 _registUserNameStopper.Set();
                 return;
             }
@@ -237,7 +238,7 @@ namespace TinyChat
                 int ROOM_CHAT = 2;
                 if (tokens[FLAG] != "TRUE")
                 {
-                    printResiveMessage("入室に失敗しました。");
+                    ShowReport(true, "入室に失敗しました。");
                     return;
                 }
                 Invoke(new Action(() => resiveMessageTextBox.Clear()));
@@ -251,7 +252,7 @@ namespace TinyChat
                 int CHAT = 2;
                 if(tokens[FLAG] == "FALSE")
                 {
-                    printResiveMessage("チャットの取得に失敗");
+                    ShowReport(true, "チャットの取得に失敗");
                     return;
                 }
                 Invoke(new Action(() => resiveMessageTextBox.Text = tokens[CHAT]));
@@ -262,14 +263,14 @@ namespace TinyChat
             {
                 int FLAG = 1;
                 if (tokens[FLAG] == "FALSE")
-                    printResiveMessage("退室に失敗しました。");
+                    ShowReport(true, "退室に失敗しました。");
             }
 
             if (command.StartsWith("RETURN_CREATE_ROOM"))
             {
                 int FLAG = 1;
                 if (tokens[FLAG] == "FALSE")
-                    printResiveMessage("部屋の作成に失敗しました。");
+                    ShowReport(true, "部屋の作成に失敗しました。");
             }
         }
 
@@ -293,12 +294,12 @@ namespace TinyChat
             }
             catch (NullReferenceException ex)
             {
-                ShowReport(ex.Message, nameof(sendAsync));
+                Debug.WriteLine(ex.Message);
                 stateEnabled(true);
             }
             catch (Exception ex)
             {
-                ShowReport(ex.Message, nameof(sendAsync));
+                Debug.WriteLine(ex.Message);
                 stateEnabled(true);
             }
         }
@@ -309,13 +310,21 @@ namespace TinyChat
             _client = (Socket)result.AsyncState;
             if(_client.EndSend(result) < 0)
             {
-                ShowReport("送信エラー");
+                ShowReport(true, "送信エラー");
             }
         }
 
         void printResiveMessage(string message)
         {
             Invoke(new Action(() => resiveMessageTextBox.Text += message + Escape.Return));
+        }
+
+        void ShowReport(bool warning, string message, string functionName = "")
+        {
+            Invoke(new Action(() => {
+                reportLabel.ForeColor = warning ? Color.Red : Color.Black;
+                reportLabel.Text = functionName + message;
+            }));
         }
 
         // 部屋情報更新
@@ -341,7 +350,7 @@ namespace TinyChat
             int selectRoomIndex = Convert.ToInt32(selectedRoomIDLabel.Text);
             if (selectRoomIndex == -1)
             {
-                ShowReport("入室エラー");
+                ShowReport(true, "入室エラー");
                 return;
             }
             int roomID = RoomInfoList.Get(selectRoomIndex).ID;
@@ -360,15 +369,15 @@ namespace TinyChat
         {
             SyncFlag.IsGetChatPooling = true;
             Task.Run(() => {
-                while (SyncFlag.IsGetChatPooling)
+                while (SyncFlag.IsGetChatPooling && _client != null)
                 {
                     try
-                    {
+                    {                        
                         sendAsync(CreateCommand.GET_CHAT(ClientInfo.UserName, ClientInfo.CurrentRoomID.ToString()));
                     }
                     catch (Exception ex)
                     {
-                        ShowReport(ex.Message, nameof(GetChatPooling));
+                        Debug.WriteLine(ex.Message);
                         stateEnabled(true);
                         break;
                     }
@@ -382,7 +391,7 @@ namespace TinyChat
         {
             SyncFlag.IsGetRoomInfoPooling = true;
             Task.Run(() => {
-                while (SyncFlag.IsGetRoomInfoPooling)
+                while (SyncFlag.IsGetRoomInfoPooling && _client != null)
                 {
                     try
                     {
@@ -390,7 +399,7 @@ namespace TinyChat
                     }
                     catch (Exception ex)
                     {
-                        ShowReport(ex.Message, nameof(GetRoomInfoPooling));
+                        Debug.WriteLine(ex.Message);
                         stateEnabled(true);
                         break;
                     }

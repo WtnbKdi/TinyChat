@@ -56,8 +56,8 @@
             this.createRoomButton = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
             this.roomNameTextBox = new System.Windows.Forms.TextBox();
-            this.label9 = new System.Windows.Forms.Label();
             this.reportLabel = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -346,32 +346,32 @@
             this.roomNameTextBox.Size = new System.Drawing.Size(222, 19);
             this.roomNameTextBox.TabIndex = 0;
             // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(12, 473);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(29, 12);
-            this.label9.TabIndex = 12;
-            this.label9.Text = "報告";
-            // 
             // reportLabel
             // 
             this.reportLabel.AutoSize = true;
-            this.reportLabel.Location = new System.Drawing.Point(47, 473);
+            this.reportLabel.Location = new System.Drawing.Point(43, 481);
             this.reportLabel.Name = "reportLabel";
             this.reportLabel.Size = new System.Drawing.Size(29, 12);
             this.reportLabel.TabIndex = 13;
             this.reportLabel.Text = "none";
             // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(10, 481);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(29, 12);
+            this.label10.TabIndex = 12;
+            this.label10.Text = "報告";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(651, 494);
+            this.ClientSize = new System.Drawing.Size(651, 514);
             this.Controls.Add(this.reportLabel);
-            this.Controls.Add(this.label9);
             this.Controls.Add(this.groupBox5);
+            this.Controls.Add(this.label10);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
@@ -424,8 +424,8 @@
         private System.Windows.Forms.Button createRoomButton;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox roomNameTextBox;
-        private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label reportLabel;
+        private System.Windows.Forms.Label label10;
     }
 }
 
