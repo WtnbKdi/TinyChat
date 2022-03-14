@@ -21,8 +21,6 @@ namespace TinyChat
         {
             InitializeComponent();
             _isConnected = false;
-            SyncFlag.IsGetChatPooling = false;
-            SyncFlag.IsGetRoomInfoPooling = false;
             _isRunning = false;
             _loomListLock = new object();
             _client = null;
@@ -37,17 +35,16 @@ namespace TinyChat
                 userNameTextBox.Enabled = state;
                 portNumTextBox.Enabled = state;
                 ipAddressTextBox.Enabled = state;
-                connectButton.Text = state ? "接続する" : "切断する";
+                connectButton.Text = state ? "接続する" : "終了する";
                 if (state)
                 {
                     _client?.Close();
                     _client = null;
                     _checkUserNameStopper.Reset();
                     _registUserNameStopper.Reset();
-                    _isConnected = !state;
+                    _isConnected = false;
                     SyncFlag.IsGetChatPooling = false;
                     SyncFlag.IsGetRoomInfoPooling = false;
-                    this.Close();
                 }
             }));
         }
@@ -55,6 +52,7 @@ namespace TinyChat
         void ShowReport(string message, string functionName = "")
         {
             Invoke(new Action(() => reportLabel.Text = functionName + message));
+            Debug.WriteLine(functionName + message);
         }
 
         // 接続ボタン
@@ -73,7 +71,7 @@ namespace TinyChat
             if (_isRunning)
             {
                 sendAsync(CreateCommand.DISSCONNECT(ClientInfo.UserName));
-                stateEnabled(true);
+                this.Close();
                 return;
             }
 
@@ -120,6 +118,7 @@ namespace TinyChat
         private void sendMessageButton_Click(object sender, EventArgs e)
         {
             if (!_isConnected) return;
+            if (!SyncFlag.IsInRoom) return;
             sendAsync(CreateCommand.SEND_MESSAGE(userNameTextBox.Text,
                 ClientInfo.CurrentRoomID.ToString(),
                 sendMessageTextBox.Text));
@@ -292,6 +291,11 @@ namespace TinyChat
                 rDataInfo.Socket = _client;
                 resiveAsync(rDataInfo);
             }
+            catch (NullReferenceException ex)
+            {
+                ShowReport(ex.Message, nameof(sendAsync));
+                stateEnabled(true);
+            }
             catch (Exception ex)
             {
                 ShowReport(ex.Message, nameof(sendAsync));
@@ -331,7 +335,8 @@ namespace TinyChat
         private void roomInButton_Click(object sender, EventArgs e)
         {
             if (!_isConnected) return;
-            
+
+            SyncFlag.IsInRoom = true;
             sendAsync(CreateCommand.OUT_ROOM(userNameTextBox.Text, ClientInfo.CurrentRoomID.ToString()));
             int selectRoomIndex = Convert.ToInt32(selectedRoomIDLabel.Text);
             if (selectRoomIndex == -1)
