@@ -7,7 +7,7 @@ LAN内で使えるチャットツールです。
 - 部屋の作成
 
 # 動作動画
-https://www.youtube.com/watch?v=U0A9a6AEu_I
+https://youtu.be/YcRR25khky0
 
 # 画像
 ![2](https://user-images.githubusercontent.com/98020159/157441976-017b84ac-3c51-4ac8-8984-04c4c40fb301.png)
