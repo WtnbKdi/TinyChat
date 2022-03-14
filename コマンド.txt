@@ -7,7 +7,7 @@
 1-2 RETURN_REGIST_USERNAME,(TRUE|FALSE),END
 
 部屋情報
-1-1 GET_ROOM_INFO,END 部屋情報の取得
+1-1 GET_ROOM_INFO,END 
 1-2 RETURN_ROOM_INFO,(部屋ID,部屋名,人数,(メンバー,)+)+,END       
 
 入室
