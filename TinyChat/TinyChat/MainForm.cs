@@ -255,7 +255,7 @@ namespace TinyChat
                     printResiveMessage("チャットの取得に失敗");
                     return;
                 }
-                Invoke(new Action(() => printResiveMessage(tokens[CHAT])));
+                Invoke(new Action(() => resiveMessageTextBox.Text = tokens[CHAT]));
                 return;
             }
 

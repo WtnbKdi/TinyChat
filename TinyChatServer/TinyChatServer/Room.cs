@@ -18,7 +18,6 @@ namespace TinyChatServer
         public Room() { }
         public Room(string name, int id) 
         {
-            //this.Chat = $"{DateTime.Now} > チャット作成\r\n";
             this.Name = name;
             this.ID = id;
         }
