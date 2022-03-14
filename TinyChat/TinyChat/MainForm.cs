@@ -62,7 +62,6 @@ namespace TinyChat
             string ipAddr = ipAddressTextBox.Text, 
                    port = portNumTextBox.Text, 
                    userName = userNameTextBox.Text;
-
             if (!ConnectInfoFormat.Check(ipAddr, port, userName))
             {
                 ShowReport(true, "接続設定を確認してください。(ユーザー名の場合は4~10文字です)");
