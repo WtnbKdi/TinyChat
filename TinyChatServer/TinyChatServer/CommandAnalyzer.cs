@@ -76,6 +76,7 @@ namespace TinyChatServer
                 List<Room> roomList = RoomList.GetRoomList();
                 foreach(var room in roomList)
                     RoomList.RemoveMember(room.ID, tokens[memberName]);
+                LoginUserName.Delete(tokens[memberName]);
             }
             return null;
         }

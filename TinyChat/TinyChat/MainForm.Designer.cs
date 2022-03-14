@@ -47,11 +47,11 @@
             this.resiveMessageTextBox = new System.Windows.Forms.TextBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.memberNumStatusLabel = new System.Windows.Forms.Label();
+            this.currentRoomMemberNumStatusLabel = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.roomNameStatusLabel = new System.Windows.Forms.Label();
+            this.currentRoomNameLabel = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.roomMemberStatusListBox = new System.Windows.Forms.ListBox();
+            this.currentRoomMemberListBox = new System.Windows.Forms.ListBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.createRoomButton = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
@@ -240,11 +240,11 @@
             // groupBox4
             // 
             this.groupBox4.Controls.Add(this.label5);
-            this.groupBox4.Controls.Add(this.memberNumStatusLabel);
+            this.groupBox4.Controls.Add(this.currentRoomMemberNumStatusLabel);
             this.groupBox4.Controls.Add(this.label6);
-            this.groupBox4.Controls.Add(this.roomNameStatusLabel);
+            this.groupBox4.Controls.Add(this.currentRoomNameLabel);
             this.groupBox4.Controls.Add(this.label4);
-            this.groupBox4.Controls.Add(this.roomMemberStatusListBox);
+            this.groupBox4.Controls.Add(this.currentRoomMemberListBox);
             this.groupBox4.Location = new System.Drawing.Point(12, 217);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(282, 170);
@@ -261,14 +261,14 @@
             this.label5.TabIndex = 11;
             this.label5.Text = "メンバー";
             // 
-            // memberNumStatusLabel
+            // currentRoomMemberNumStatusLabel
             // 
-            this.memberNumStatusLabel.AutoSize = true;
-            this.memberNumStatusLabel.Location = new System.Drawing.Point(57, 42);
-            this.memberNumStatusLabel.Name = "memberNumStatusLabel";
-            this.memberNumStatusLabel.Size = new System.Drawing.Size(29, 12);
-            this.memberNumStatusLabel.TabIndex = 10;
-            this.memberNumStatusLabel.Text = "none";
+            this.currentRoomMemberNumStatusLabel.AutoSize = true;
+            this.currentRoomMemberNumStatusLabel.Location = new System.Drawing.Point(57, 42);
+            this.currentRoomMemberNumStatusLabel.Name = "currentRoomMemberNumStatusLabel";
+            this.currentRoomMemberNumStatusLabel.Size = new System.Drawing.Size(29, 12);
+            this.currentRoomMemberNumStatusLabel.TabIndex = 10;
+            this.currentRoomMemberNumStatusLabel.Text = "none";
             // 
             // label6
             // 
@@ -279,14 +279,14 @@
             this.label6.TabIndex = 9;
             this.label6.Text = "人数";
             // 
-            // roomNameStatusLabel
+            // currentRoomNameLabel
             // 
-            this.roomNameStatusLabel.AutoSize = true;
-            this.roomNameStatusLabel.Location = new System.Drawing.Point(57, 21);
-            this.roomNameStatusLabel.Name = "roomNameStatusLabel";
-            this.roomNameStatusLabel.Size = new System.Drawing.Size(29, 12);
-            this.roomNameStatusLabel.TabIndex = 8;
-            this.roomNameStatusLabel.Text = "none";
+            this.currentRoomNameLabel.AutoSize = true;
+            this.currentRoomNameLabel.Location = new System.Drawing.Point(57, 21);
+            this.currentRoomNameLabel.Name = "currentRoomNameLabel";
+            this.currentRoomNameLabel.Size = new System.Drawing.Size(29, 12);
+            this.currentRoomNameLabel.TabIndex = 8;
+            this.currentRoomNameLabel.Text = "none";
             // 
             // label4
             // 
@@ -297,16 +297,16 @@
             this.label4.TabIndex = 7;
             this.label4.Text = "部屋名";
             // 
-            // roomMemberStatusListBox
+            // currentRoomMemberListBox
             // 
-            this.roomMemberStatusListBox.BackColor = System.Drawing.Color.White;
-            this.roomMemberStatusListBox.FormattingEnabled = true;
-            this.roomMemberStatusListBox.ItemHeight = 12;
-            this.roomMemberStatusListBox.Location = new System.Drawing.Point(11, 84);
-            this.roomMemberStatusListBox.Name = "roomMemberStatusListBox";
-            this.roomMemberStatusListBox.ScrollAlwaysVisible = true;
-            this.roomMemberStatusListBox.Size = new System.Drawing.Size(265, 76);
-            this.roomMemberStatusListBox.TabIndex = 0;
+            this.currentRoomMemberListBox.BackColor = System.Drawing.Color.White;
+            this.currentRoomMemberListBox.FormattingEnabled = true;
+            this.currentRoomMemberListBox.ItemHeight = 12;
+            this.currentRoomMemberListBox.Location = new System.Drawing.Point(11, 84);
+            this.currentRoomMemberListBox.Name = "currentRoomMemberListBox";
+            this.currentRoomMemberListBox.ScrollAlwaysVisible = true;
+            this.currentRoomMemberListBox.Size = new System.Drawing.Size(265, 76);
+            this.currentRoomMemberListBox.TabIndex = 0;
             // 
             // groupBox5
             // 
@@ -413,11 +413,11 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label memberNumStatusLabel;
+        private System.Windows.Forms.Label currentRoomMemberNumStatusLabel;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label roomNameStatusLabel;
+        private System.Windows.Forms.Label currentRoomNameLabel;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.ListBox roomMemberStatusListBox;
+        private System.Windows.Forms.ListBox currentRoomMemberListBox;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label selectedRoomIDLabel;
         private System.Windows.Forms.GroupBox groupBox5;

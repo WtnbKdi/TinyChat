@@ -49,7 +49,10 @@ namespace TinyChat
                     SyncFlag.IsGetRoomInfoPooling = false;
                     resiveMessageTextBox.Clear();
                     roomListBox.Items.Clear();
-                    roomMemberStatusListBox.Items.Clear();
+                    currentRoomMemberListBox.Items.Clear();
+                    selectedRoomIDLabel.Text = "-1";
+                    currentRoomNameLabel.Text = "";
+                    currentRoomMemberNumStatusLabel.Text = "";
                 }
             }));
         }
@@ -110,6 +113,7 @@ namespace TinyChat
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
+                ShowReport(true, ex.Message);
                 stateEnabled(true);
             }
         }
@@ -331,11 +335,11 @@ namespace TinyChat
         {
             Invoke(new Action(() =>
             {
-                roomNameStatusLabel.Text = roomInfo.Name;
-                memberNumStatusLabel.Text = roomInfo.MemberNum.ToString(); // +1は自分
-                roomMemberStatusListBox.Items.Clear();
+                currentRoomNameLabel.Text = roomInfo.Name;
+                currentRoomMemberNumStatusLabel.Text = roomInfo.MemberNum.ToString(); // +1は自分
+                currentRoomMemberListBox.Items.Clear();
                 foreach (var memberName in roomInfo.MemberNameList)
-                    roomMemberStatusListBox.Items.Add(memberName);
+                    currentRoomMemberListBox.Items.Add(memberName);
             }));    
         }
 
