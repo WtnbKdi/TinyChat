@@ -1,3 +1,6 @@
+1-1 <- クライアント -> サーバー
+1-2 <- サーバー -> クライアント
+
 ユーザー名重複チェック
 1-1 CHECK_USERNAME,ユーザー名,END                
 1-2 RETURN_CHECK_USERNAME,(TRUE|FALSE),END       
